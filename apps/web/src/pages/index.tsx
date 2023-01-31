@@ -4,7 +4,7 @@ import { signIn, signOut, useSession } from "next-auth/react";
 import { ArrowUpOnSquareIcon, BuildingLibraryIcon, InboxArrowDownIcon } from '@heroicons/react/24/outline'
 
 import { api } from "../utils/api";
-import IconTile from "../components/iconTile";
+import IconTile from "../components/IconTile";
 import { useRouter } from "next/router";
 
 const Home: NextPage = () => {
@@ -27,8 +27,8 @@ const Home: NextPage = () => {
       <main className="flex flex-col items-center mx-auto h-full w-full flex-1">
         <div className="container flex flex-col items-center justify-center gap-10 px-4 py-16">
           <div className="flex flex-col max-w-5xl items-center justify-center text-center">
-            <h1 className="text-6xl font-bold text-red-500 bg-clip-text text-transparent p-2">Rekindle your highlights, daily.</h1>
-            <h2 className="text-xl text-gray-600 font-bold max-w-2xl">
+            <h1 className="text-5xl sm:text-6xl font-bold text-red-500 bg-clip-text text-transparent p-2">Rekindle your highlights, daily.</h1>
+            <h2 className="text-lg sm:text-xl text-gray-600 font-semibold max-w-2xl">
               A daily email with a collection of quotes from your Kindle highlights. Never forget a great quote again.
             </h2>
           </div>
@@ -37,10 +37,10 @@ const Home: NextPage = () => {
             className="w-52 bg-red-500 text-white font-bold py-2 px-4 rounded-full duration-200 ease-in-out transform hover:scale-110 hover:bg-red-600"
             onClick={onGetStarted}>Get Started</button>
           {/* TODO: Add auth login with amazon or discord */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-            <IconTile icon={<InboxArrowDownIcon className='w-14 h-14' />} title='A daily email' description="With curated quotes for the day from your kindle highlights." />
-            <IconTile icon={<BuildingLibraryIcon className='w-14 h-14' />} title='Connect via your library' description="Our chrome plugin allows you to seamlessly import online." />
-            <IconTile icon={<ArrowUpOnSquareIcon className='w-14 h-14' />} title='Connect via file import' description="Our online service allows manual file imports via your kindle." />
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <IconTile icon={<InboxArrowDownIcon className='w-14 h-14 text-red-500' />} title='A daily email' description="With curated quotes for the day from your kindle highlights." />
+            <IconTile icon={<BuildingLibraryIcon className='w-14 h-14 text-red-500' />} title='Connect via your library' description="Our chrome plugin allows you to seamlessly import online." />
+            <IconTile icon={<ArrowUpOnSquareIcon className='w-14 h-14 text-red-500' />} title='Connect via file import' description="Our online service allows manual file imports via your kindle." />
           </div>
         </div>
       </main>
