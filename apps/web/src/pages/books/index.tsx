@@ -3,12 +3,49 @@ import Head from "next/head";
 
 import { requireAuth } from "../../utils/requireAuth";
 import BooksTable from "../../components/BooksTable";
+import { getSession } from "next-auth/react";
+import { prisma } from "../../server/db";
+import { Book } from "@prisma/client";
+import { Column } from "react-table";
 
 export const getServerSideProps = requireAuth(async (ctx) => {
-    return { props: {} }
+    const session = await getSession({ ctx });
+    const books = await prisma.book.findMany({
+        where: {
+            userId: session?.user.id
+        }
+    });
+    return {
+        props: {
+            books: books
+        }
+    }
 }, 'books');
 
-const Books: NextPage = () => {
+type Props = {
+    books: Book[];
+}
+
+const columns: Column<any>[] = [
+    {
+        Header: 'Title',
+        accessor: 'title'
+    },
+    {
+        Header: 'Author',
+        accessor: 'author'
+    },
+    {
+        Header: 'Highlights',
+        accessor: 'totalHighlights'
+    },
+    {
+        Header: 'Last Highlight',
+        accessor: 'lastHighlightedOn'
+    }
+];
+
+const Books: NextPage<Props> = ({ books }) => {
     return (
         <>
             <Head>
@@ -17,9 +54,13 @@ const Books: NextPage = () => {
                 <link rel="icon" href="/favicon.ico" />
             </Head>
             <main>
-                <h1 className="text-4xl font-bold mt-10">Books</h1>
+                <h1 className="text-4xl font-bold">Books</h1>
                 <div className="flex flex-col">
-                    <BooksTable columns={[{ Header: 'Title', accessor: 'title' }, { Header: 'Author', accessor: 'author' }]} data={[{ title: 'The Hobbit', author: 'J.R.R. Tolkien' }, { title: 'The Fellowship of the Ring', author: 'J.R.R. Tolkien' }]} />
+                    {
+                        books.length > 0
+                            ? <BooksTable columns={columns} data={books} />
+                            : <p className="text-gray-500">No books found</p>
+                    }
                 </div>
             </main>
         </>

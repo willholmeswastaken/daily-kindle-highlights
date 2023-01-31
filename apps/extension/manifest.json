@@ -1,0 +1,15 @@
+{
+  "manifest_version": 2,
+  "name": "Rekindled",
+  "description": "An extension that will import your kindle highlights from your library into the Rekindled platform.",
+  "version": "1.0.0",
+  "permissions": [
+    "activeTab",
+    "http://localhost:3000/*",
+    "http://*.example.com/*"
+  ],
+  "background": {
+    "scripts": ["index.js"],
+    "persistent": false
+  }
+}

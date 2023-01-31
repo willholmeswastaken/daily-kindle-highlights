@@ -4,12 +4,37 @@ import Head from "next/head";
 import { requireAuth } from "../../../utils/requireAuth";
 import QuoteTile from "../../../components/QuoteTile";
 import Link from "next/link";
+import { prisma } from "../../../server/db";
+import { Highlight } from "@prisma/client";
+import { getSession } from "next-auth/react";
 
 export const getServerSideProps = requireAuth(async (ctx) => {
-    return { props: {} }
+    const session = await getSession({ ctx });
+    const book = await prisma.book.findUnique({
+        where: {
+            id: ctx.query.bookid as string
+        },
+        include: {
+            highlights: true
+        }
+    });
+    if (book?.userId !== session?.user.id) {
+        return {
+            notFound: true
+        }
+    }
+    return {
+        props: {
+            highlights: book?.highlights
+        }
+    }
 }, 'books');
 
-const BookReview: NextPage = () => {
+type Props = {
+    highlights: Highlight[];
+}
+
+const BookReview: NextPage<Props> = ({ highlights }) => {
     return (
         <>
             <Head>
@@ -18,10 +43,13 @@ const BookReview: NextPage = () => {
                 <link rel="icon" href="/favicon.ico" />
             </Head>
             <main className="flex flex-col justify-center items-center gap-4">
-                <h1 className="text-4xl font-bold mt-10">Your next five moves</h1>
+                <h1 className="text-4xl font-bold">Your next five moves</h1>
                 <div className="flex flex-col gap-y-4">
-                    <QuoteTile quote="The world is full of magic things, patiently waiting for our senses to grow sharper." location="Winnie the Pooh" />
-                    <QuoteTile quote="The world is full of magic things, patiently waiting for our senses to grow sharper." location="Winnie the Pooh" />
+                    {
+                        highlights.length > 0
+                            ? highlights.map((highlight) => <QuoteTile key={highlight.id} quote={highlight.content} location={highlight.location} />)
+                            : <p className="text-gray-500">No highlights found</p>
+                    }
                 </div>
                 <Link className="bg-red-500 text-white px-4 py-2 rounded-lg" href={"/books"}>Back</Link>
             </main>
