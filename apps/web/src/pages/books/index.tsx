@@ -1,7 +1,6 @@
 import { type NextPage } from "next";
 import Head from "next/head";
 import { getSession } from "next-auth/react";
-import { Column } from "react-table";
 
 import { requireAuth } from "../../utils/requireAuth";
 import { prisma } from "../../server/db";
@@ -33,25 +32,6 @@ export const getServerSideProps = requireAuth(async (ctx) => {
 type Props = {
     books: BookViewModel[];
 }
-
-const columns: Column<any>[] = [
-    {
-        Header: 'Title',
-        accessor: 'title'
-    },
-    {
-        Header: 'Author',
-        accessor: 'author'
-    },
-    {
-        Header: 'Highlights',
-        accessor: 'totalHighlights'
-    },
-    {
-        Header: 'Last Highlight',
-        accessor: 'lastHighlightedOn'
-    }
-];
 
 const Books: NextPage<Props> = ({ books }) => {
     return (
