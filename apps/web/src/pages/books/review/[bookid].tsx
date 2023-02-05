@@ -7,6 +7,8 @@ import Link from "next/link";
 import { prisma } from "../../../server/db";
 import { Highlight } from "@prisma/client";
 import { getSession } from "next-auth/react";
+import { HighlightViewModel } from "../../../types/HighlightViewModel";
+import { parseDateForDisplay } from "../../../utils/parseDateForDisplay";
 
 export const getServerSideProps = requireAuth(async (ctx) => {
     const session = await getSession({ ctx });
@@ -15,26 +17,36 @@ export const getServerSideProps = requireAuth(async (ctx) => {
             id: ctx.query.bookid as string
         },
         include: {
-            highlights: true
-        }
+            highlights: {
+                orderBy: {
+                    location: 'asc'
+                }
+            }
+        },
     });
+    console.log('User id from book', book?.userId);
+    console.log('User id from session', session?.user.id);
     if (book?.userId !== session?.user.id) {
-        return {
-            notFound: true
-        }
+        ctx.res.setHeader('Location', '/404');
+        ctx.res.statusCode = 302;
+        ctx.res.end();
     }
     return {
         props: {
-            highlights: book?.highlights
+            title: book?.title,
+            author: book?.author,
+            highlights: book?.highlights.map(x => ({ ...x, highlightedOn: parseDateForDisplay(x.highlightedOn) }))
         }
     }
 }, 'books');
 
 type Props = {
-    highlights: Highlight[];
+    title: string;
+    author: string;
+    highlights: HighlightViewModel[];
 }
 
-const BookReview: NextPage<Props> = ({ highlights }) => {
+const BookReview: NextPage<Props> = ({ title, author, highlights }) => {
     return (
         <>
             <Head>
@@ -43,10 +55,14 @@ const BookReview: NextPage<Props> = ({ highlights }) => {
                 <link rel="icon" href="/favicon.ico" />
             </Head>
             <main className="flex flex-col justify-center items-center gap-4">
-                <h1 className="text-4xl font-bold">Your next five moves</h1>
+                <div className="flex flex-col text-center">
+                    <h1 className="text-4xl text-red-500 font-bold">{title}</h1>
+                    <h2 className="text-2xl text-gray-400 italic">By {author}</h2>
+                </div>
                 <div className="flex flex-col gap-y-4">
                     {
-                        highlights.length > 0
+                        highlights &&
+                            highlights.length > 0
                             ? highlights.map((highlight) => <QuoteTile key={highlight.id} quote={highlight.content} location={highlight.location} />)
                             : <p className="text-gray-500">No highlights found</p>
                     }

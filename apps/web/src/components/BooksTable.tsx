@@ -1,8 +1,9 @@
 import { useTable, Column } from 'react-table';
+import { BookViewModel } from '../types/BookViewModel';
 
 type Props = {
     columns: Array<Column<any>>;
-    data: Array<any>;
+    data: Array<BookViewModel>;
 }
 
 const BooksTable = ({ columns, data }: Props) => {
@@ -30,7 +31,7 @@ const BooksTable = ({ columns, data }: Props) => {
                                     <tr {...row.getRowProps()} className="bg-white border-b">
                                         {row.cells.map((cell, index) => {
                                             return <td className='text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap' {...cell.getCellProps()}>
-                                                {index === 0 ? <a href="/books/review/123" className='cursor-pointer text-blue-600 font-semibold underline'>{cell.render('Cell')}</a> : cell.render('Cell')}
+                                                {index === 0 ? <a href={`/books/review/${row.original.id}`} className='cursor-pointer text-blue-600 font-semibold underline'>{cell.render('Cell')}</a> : cell.render('Cell')}
                                             </td>
                                         })}
                                     </tr>

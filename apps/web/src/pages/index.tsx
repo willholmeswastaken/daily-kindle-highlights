@@ -25,7 +25,7 @@ const Home: NextPage = () => {
       </Head>
       <main className="flex flex-col items-center justify-center gap-10 h-full w-full flex-1">
         <div className="flex flex-col max-w-5xl items-center justify-center text-center">
-          <h1 className="text-5xl sm:text-6xl font-bold text-red-500 bg-clip-text text-transparent p-2">Rekindle your highlights, daily.</h1>
+          <h1 className="text-5xl sm:text-6xl font-bold text-red-500 p-2">Rekindle your highlights, daily.</h1>
           <h2 className="text-lg sm:text-xl text-gray-600 font-semibold max-w-2xl">
             A daily email with a collection of quotes from your Kindle highlights. Never forget a great quote again.
           </h2>
@@ -36,8 +36,9 @@ const Home: NextPage = () => {
           onClick={onGetStarted}>Get Started</button>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           <IconTile icon={<InboxArrowDownIcon className='w-14 h-14 text-red-500' />} title='A daily email' description="With curated quotes for the day from your kindle highlights." />
-          <IconTile icon={<BuildingLibraryIcon className='w-14 h-14 text-red-500' />} title='Connect via your library' description="Our chrome plugin allows you to seamlessly import online." />
           <IconTile icon={<ArrowUpOnSquareIcon className='w-14 h-14 text-red-500' />} title='Connect via file import' description="Our online service allows manual file imports via your kindle." />
+          <IconTile icon={<BuildingLibraryIcon className='w-14 h-14 text-red-500' />} title='Remember your highlights' description="Remember what you read and rekindle your highlights." />
+
         </div>
       </main>
     </>

@@ -77,12 +77,13 @@ model Book {
 }
 
 model Highlight {
-  id       String  @id @default(cuid())
-  content  String
-  page     String?
-  location String
-  bookId   String
-  book     Book    @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  id            String    @id @default(cuid())
+  content       String
+  page          String?
+  location      Int
+  bookId        String
+  highlightedOn DateTime?
+  book          Book      @relation(fields: [bookId], references: [id], onDelete: Cascade)
 }
 
 model Import {

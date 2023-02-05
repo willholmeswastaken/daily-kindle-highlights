@@ -1,5 +1,3 @@
-import React from 'react'
-
 type Props = {
     quote: string;
     location: string;
@@ -7,9 +5,9 @@ type Props = {
 
 const QuoteTile = ({ quote, location }: Props) => {
     return (
-        <div className="bg-white shadow rounded-lg p-4 w-[600px]" >
-            <p className="text-gray-700 text-lg">{quote}</p>
-            <p className="text-gray-500 text-sm italic mt-2">{location}</p>
+        <div className="bg-white shadow-xl rounded-lg p-10 w-full sm:w-[600px] border border-gray-200" >
+            <p className="text-gray-700 text-md">{quote}</p>
+            <p className="text-gray-500 text-sm italic mt-2">(Location {location})</p>
         </div>
     )
 }

@@ -3,11 +3,14 @@ import { type Session } from "next-auth";
 import { SessionProvider } from "next-auth/react";
 import dayjs from "dayjs";
 import calendar from 'dayjs/plugin/calendar';
+import { ToastContainer } from "react-toastify";
 
 import { api } from "../utils/api";
+import Header from "../components/Header";
 
 import "../styles/globals.css";
-import Header from "../components/Header";
+import 'react-toastify/dist/ReactToastify.css';
+
 
 dayjs.extend(calendar)
 
@@ -17,6 +20,7 @@ const MyApp: AppType<{ session: Session | null }> = ({
 }) => {
   return (
     <SessionProvider session={session}>
+      <ToastContainer />
       <div className="flex min-h-screen flex-col items-center w-screen">
         {/* add a blurred bottom border in the header with tailwindcss */}
         <Header />
