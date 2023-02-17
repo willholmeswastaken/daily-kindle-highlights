@@ -6,9 +6,9 @@ generator client {
   binaryTargets = ["darwin", "rhel-openssl-1.0.x"]
 }
 
-generator erd {
-  provider = "prisma-erd-generator"
-}
+// generator erd {
+//   provider = "prisma-erd-generator"
+// }
 
 datasource db {
   provider = "postgresql"
