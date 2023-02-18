@@ -5,6 +5,7 @@ import { Import } from "@prisma/client";
 import { prisma } from "../../server/db";
 import { KindleHighlightsService } from "../../services/KindleHighlights";
 import { ApiResponse } from "../../types";
+import { logger } from "../../utils/logger";
 
 export default async function (req: NextApiRequest, res: NextApiResponse) {
   const session = await getServerAuthSession({ req, res });
@@ -25,6 +26,9 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
     return;
   }
 
+  let importLogger = logger;
+  importLogger.info("Creating import");
+
   const highlightsImport: Import = await prisma.import.create({
     data: {
       userId: session.user.id,
@@ -32,28 +36,33 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
       importType: "Manual",
     },
   });
-  console.log("Import created: ", highlightsImport);
+
+  importLogger.info({ importId: highlightsImport.importId }, "Import created");
+  importLogger = importLogger.child({ importId: highlightsImport.importId });
+
   try {
     const kindleHighlightsService = new KindleHighlightsService(
       req.body,
       session.user.id
     );
+
     await kindleHighlightsService.saveBooks(highlightsImport.id);
   } catch (e) {
-    console.error(e);
+    importLogger.error(e, "Error importing highlights");
+
     await prisma.import.delete({
       where: {
         id: highlightsImport.id,
       },
     });
+
     return res.status(500).json({
       errorMessage: "Error importing highlights",
       responseCode: "500",
     } as ApiResponse<string>);
   }
 
-  console.log("Import complete: ", highlightsImport);
-
+  importLogger.info("Import complete");
   res.status(201).json({
     responseCode: "201",
     data: highlightsImport.id,

@@ -5,7 +5,6 @@ import { requireAuth } from "../../../utils/requireAuth";
 import QuoteTile from "../../../components/QuoteTile";
 import Link from "next/link";
 import { prisma } from "../../../server/db";
-import { Highlight } from "@prisma/client";
 import { getSession } from "next-auth/react";
 import { HighlightViewModel } from "../../../types/HighlightViewModel";
 import { parseDateForDisplay } from "../../../utils/parseDateForDisplay";
@@ -24,8 +23,6 @@ export const getServerSideProps = requireAuth(async (ctx) => {
             }
         },
     });
-    console.log('User id from book', book?.userId);
-    console.log('User id from session', session?.user.id);
     if (book?.userId !== session?.user.id) {
         ctx.res.setHeader('Location', '/404');
         ctx.res.statusCode = 302;

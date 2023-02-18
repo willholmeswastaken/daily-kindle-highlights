@@ -23,7 +23,6 @@ export const serverSchema = z.object({
   DISCORD_CLIENT_SECRET: z.string(),
   EMAIL_SECRET_KEY: z.string(),
   EMAIL_USERNAME: z.string(),
-  EMAIL_PASSWORD: z.string(),
   SENDGRID_API_KEY: z.string(),
 });
 
@@ -41,7 +40,6 @@ export const serverEnv = {
   DISCORD_CLIENT_SECRET: process.env.DISCORD_CLIENT_SECRET,
   EMAIL_SECRET_KEY: process.env.EMAIL_SECRET_KEY,
   EMAIL_USERNAME: process.env.EMAIL_USERNAME,
-  EMAIL_PASSWORD: process.env.EMAIL_PASSWORD,
   SENDGRID_API_KEY: process.env.SENDGRID_API_KEY,
 };
 

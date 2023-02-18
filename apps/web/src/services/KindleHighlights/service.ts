@@ -1,13 +1,19 @@
 import dayjs from "dayjs";
+import { Highlight } from "@prisma/client";
+import { Logger } from "pino";
+
 import { prisma } from "../../server/db";
 import { KindleEntry } from "./kindleEntry";
 import { KindleEntryParsed } from "./kindleEntryParsed";
 import { parseKindleEntries, readKindleClipping } from "./parser";
 import { organizeKindleEntriesByBookTitle } from "./utils";
+import { logger } from "../../utils/logger";
 
 export class KindleHighlightsService {
   private readonly userId: string;
   private kindleEntries: Array<KindleEntry>;
+
+  private logger: Logger | undefined;
 
   constructor(highlights: string, userId: string) {
     this.userId = userId;
@@ -16,69 +22,58 @@ export class KindleHighlightsService {
 
   async saveBooks(importId: string): Promise<void> {
     const books = this.getBooks();
+    const tasks: Array<Promise<void>> = [];
+    this.logger = logger.child({ importId });
+    this.logger.info("Building up tasks for import");
     for (let [bookTitle, highlights] of books.entries()) {
-      const existingBook = await prisma.book.findFirst({
-        where: {
-          title: bookTitle,
-          userId: this.userId,
-        },
-      });
+      tasks.push(
+        new Promise(async (res, rej) => {
+          const existingBook = await prisma.book.findFirst({
+            where: {
+              title: bookTitle,
+              userId: this.userId,
+            },
+          });
 
-      let bookId = existingBook?.id;
-      if (!existingBook) {
-        const book = await prisma.book.create({
-          data: {
-            title: bookTitle,
-            importId,
-            author: highlights[0]?.authors ?? "",
-            totalHighlights: highlights.length,
-            userId: this.userId,
-            lastHighlightedOn: dayjs(
-              highlights[highlights.length - 1]?.dateOfCreation
-            ).toDate(),
-          },
-        });
-        bookId = book.id;
-      }
-
-      await this.saveHighlights(bookId!, highlights);
-      if (existingBook) await this.updateExistingBookHighlightCount(bookId!);
-    }
-  }
-
-  async saveHighlights(
-    bookId: string,
-    entry: KindleEntryParsed[]
-  ): Promise<void> {
-    await Promise.all(
-      entry.map(
-        (highlight) =>
-          new Promise<void>(async (res, rej) => {
-            const existingHighlight = await prisma.highlight.findFirst({
-              where: {
-                bookId: bookId,
-                content: highlight.content,
-                location: highlight.location,
-                page: highlight.page.toString(),
-              },
-            });
-            if (existingHighlight) return res();
-
-            console.log("Highlighted On: ", highlight.dateOfCreation);
-
-            await prisma.highlight.create({
+          let bookId = existingBook?.id;
+          if (!existingBook) {
+            const book = await prisma.book.create({
               data: {
-                bookId: bookId,
-                content: highlight.content,
-                location: highlight.location,
-                page: highlight.page.toString(),
-                highlightedOn: dayjs(highlight.dateOfCreation).toDate(),
+                title: bookTitle,
+                importId,
+                author: highlights[0]?.authors ?? "",
+                totalHighlights: highlights.length,
+                userId: this.userId,
+                lastHighlightedOn: dayjs(
+                  highlights[highlights.length - 1]?.dateOfCreation
+                ).toDate(),
               },
             });
-            return res();
-          })
-      )
-    );
+            bookId = book.id;
+          }
+          this.logger?.info(
+            { bookTitle, bookId },
+            "Inserting highlights for book"
+          );
+          await this.saveHighlights(bookId!, highlights);
+          this.logger?.info(
+            { bookTitle, bookId },
+            "Highlights inserted for book"
+          );
+
+          if (existingBook) {
+            await this.updateExistingBookHighlightCount(bookId!);
+            this.logger?.info(
+              { bookTitle, bookId },
+              "Updated existing highlight count for book."
+            );
+          }
+          res();
+        })
+      );
+    }
+    await Promise.all(tasks);
+    this.logger.info("All tasks completed for import");
   }
 
   private getBooks(): Map<string, KindleEntryParsed[]> {
@@ -86,22 +81,68 @@ export class KindleHighlightsService {
     return organizeKindleEntriesByBookTitle(parsedEntries);
   }
 
-  private async updateExistingBookHighlightCount(
-    bookId: string
+  private async saveHighlights(
+    bookId: string,
+    highlights: KindleEntryParsed[]
   ): Promise<void> {
-    const dbHighlights = await prisma.highlight.findMany({
+    const highlightsToSave: HighlightToSave[] = [];
+    const existingHighlights = await prisma.highlight.findMany({
       where: {
         bookId: bookId,
       },
     });
-    await prisma.book.update({
-      where: {
-        id: bookId,
-      },
-      data: {
-        totalHighlights: dbHighlights.length,
-        lastHighlightedOn: dbHighlights[dbHighlights.length - 1]?.highlightedOn,
-      },
+    for (const highlight of highlights) {
+      if (
+        existingHighlights.find(
+          (h) =>
+            h.content === highlight.content &&
+            h.location === highlight.location &&
+            h.page === highlight.page.toString()
+        )
+      ) {
+        continue;
+      }
+
+      highlightsToSave.push({
+        bookId: bookId!,
+        content: highlight.content,
+        location: highlight.location,
+        page: highlight.page.toString(),
+        highlightedOn: dayjs(highlight.dateOfCreation).toDate(),
+      });
+    }
+
+    this.logger?.info(
+      { bookId, highlightsToSave: highlightsToSave.length },
+      "Saving highlights for book"
+    );
+
+    await prisma.highlight.createMany({
+      data: highlightsToSave,
+    });
+  }
+
+  private async updateExistingBookHighlightCount(
+    bookId: string
+  ): Promise<void> {
+    await prisma.$transaction(async (db) => {
+      const dbHighlights = await db.highlight.findMany({
+        where: {
+          bookId: bookId,
+        },
+      });
+      await db.book.update({
+        where: {
+          id: bookId,
+        },
+        data: {
+          totalHighlights: dbHighlights.length,
+          lastHighlightedOn:
+            dbHighlights[dbHighlights.length - 1]?.highlightedOn,
+        },
+      });
     });
   }
 }
+
+type HighlightToSave = Omit<Highlight, "id">;

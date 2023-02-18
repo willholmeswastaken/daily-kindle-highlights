@@ -7,6 +7,7 @@ import { prisma } from "../../server/db";
 import { BookViewModel } from "../../types/BookViewModel";
 import { parseDateForDisplay } from "../../utils/parseDateForDisplay";
 import { BookOpenIcon } from "@heroicons/react/24/solid";
+import Link from "next/link";
 
 export const getServerSideProps = requireAuth(async (ctx) => {
     const session = await getSession({ ctx });
@@ -47,13 +48,13 @@ const Books: NextPage<Props> = ({ books }) => {
                     {
                         books.length > 0
                             ? books.map(x => (
-                                <a href={`/books/review/${x.id}`} className="border rounded-lg min-h-[8.5rem] w-full sm:w-[10.5rem] text-left flex flex-col py-2 px-2 items-start justify-start shadow-md duration-300 ease-in-out transform hover:scale-110">
+                                <Link href={`/books/review/${x.id}`} className="border rounded-lg min-h-[8.5rem] w-full sm:w-[10.5rem] text-left flex flex-col py-2 px-2 items-start justify-start shadow-md duration-300 ease-in-out transform hover:scale-110">
                                     <div className="flex-1">
                                         <BookOpenIcon className='w-8 h-8 text-red-500' />
                                     </div>
                                     <h1 className='text-sm font-semibold text-gray-700'>{x.title}</h1>
                                     <span className='text-xs text-gray-600'>{x.author}</span>
-                                </a>
+                                </Link>
                             ))
                             : <p className="text-gray-500">No books found</p>
                     }
