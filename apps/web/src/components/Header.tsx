@@ -1,4 +1,4 @@
-import { ArrowPathIcon, BookOpenIcon } from "@heroicons/react/24/outline";
+import { ArrowPathIcon, BookOpenIcon, HeartIcon } from "@heroicons/react/24/outline";
 import { signIn, signOut, useSession } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
@@ -10,6 +10,7 @@ type MenuItem = {
     icon?: JSX.Element;
 };
 const menuItems: MenuItem[] = [
+    { name: "Favourites", url: "/favourites", icon: <HeartIcon className="h-6 w-6 flex-shrink-0 text-red-500" /> },
     { name: "Books", url: "/books", icon: <BookOpenIcon className="h-6 w-6 flex-shrink-0 text-red-500" /> },
     { name: "Sync", url: "/sync", icon: <ArrowPathIcon className="h-6 w-6 flex-shrink-0 text-red-500" /> },
 ];

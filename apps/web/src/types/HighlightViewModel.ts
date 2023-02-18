@@ -5,4 +5,7 @@ export type HighlightViewModel = {
   location: string;
   bookId: string;
   highlightedOn: string | null;
+  isFavourite: boolean;
+  bookAuthor?: string;
+  bookTitle?: string;
 };

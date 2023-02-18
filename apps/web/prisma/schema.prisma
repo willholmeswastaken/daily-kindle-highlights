@@ -83,6 +83,7 @@ model Highlight {
   location      Int
   bookId        String
   highlightedOn DateTime?
+  isFavourite   Boolean   @default(false)
   book          Book      @relation(fields: [bookId], references: [id], onDelete: Cascade)
 }
 

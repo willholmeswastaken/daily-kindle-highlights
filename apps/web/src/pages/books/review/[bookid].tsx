@@ -6,21 +6,14 @@ import QuoteTile from "../../../components/QuoteTile";
 import Link from "next/link";
 import { prisma } from "../../../server/db";
 import { getSession } from "next-auth/react";
-import { HighlightViewModel } from "../../../types/HighlightViewModel";
-import { parseDateForDisplay } from "../../../utils/parseDateForDisplay";
+import { trpc } from "../../../utils/trpc";
+import SkeletonTile from "../../../components/SkeletonTile";
 
 export const getServerSideProps = requireAuth(async (ctx) => {
     const session = await getSession({ ctx });
     const book = await prisma.book.findUnique({
         where: {
             id: ctx.query.bookid as string
-        },
-        include: {
-            highlights: {
-                orderBy: {
-                    location: 'asc'
-                }
-            }
         },
     });
     if (book?.userId !== session?.user.id) {
@@ -29,21 +22,19 @@ export const getServerSideProps = requireAuth(async (ctx) => {
         ctx.res.end();
     }
     return {
-        props: {
-            title: book?.title,
-            author: book?.author,
-            highlights: book?.highlights.map(x => ({ ...x, highlightedOn: parseDateForDisplay(x.highlightedOn) }))
-        }
+        props: { bookId: book!.id as string }
     }
 }, 'books');
 
 type Props = {
-    title: string;
-    author: string;
-    highlights: HighlightViewModel[];
+    bookId: string;
 }
 
-const BookReview: NextPage<Props> = ({ title, author, highlights }) => {
+const BookReview: NextPage<Props> = ({ bookId }) => {
+    const { isLoading, isError, data, refetch } = trpc.books.getBook.useQuery({ bookId });
+    const onFavouriteToggled = () => {
+        refetch();
+    }
     return (
         <>
             <Head>
@@ -53,15 +44,25 @@ const BookReview: NextPage<Props> = ({ title, author, highlights }) => {
             </Head>
             <main className="flex flex-col justify-center items-center gap-4">
                 <div className="flex flex-col text-center">
-                    <h1 className="text-4xl text-red-500 font-bold">{title}</h1>
-                    <h2 className="text-2xl text-gray-400 italic">By {author}</h2>
+                    <h1 className="text-4xl text-red-500 font-bold">{data?.title}</h1>
+                    <h2 className="text-2xl text-gray-400 italic">By {data?.author}</h2>
                 </div>
-                <div className="flex flex-col gap-y-4">
+                <div className="flex flex-col gap-y-4 w-full items-center">
                     {
-                        highlights &&
-                            highlights.length > 0
-                            ? highlights.map((highlight) => <QuoteTile key={highlight.id} quote={highlight.content} location={highlight.location} />)
-                            : <p className="text-gray-500">No highlights found</p>
+                        isLoading
+                            ? (
+                                <>
+                                    <SkeletonTile />
+                                    <SkeletonTile />
+                                    <SkeletonTile />
+                                </>
+                            )
+                            : (
+                                data &&
+                                    data.highlights.length > 0
+                                    ? data.highlights.map((highlight) => <QuoteTile id={highlight.id} onFavouriteToggled={onFavouriteToggled} isFavourite={highlight.isFavourite} key={highlight.id} quote={highlight.content} location={highlight.location} />)
+                                    : <p className="text-gray-500">No favourites found</p>
+                            )
                     }
                 </div>
                 <Link className="bg-red-500 text-white px-4 py-2 rounded-lg" href={"/books"}>Back</Link>

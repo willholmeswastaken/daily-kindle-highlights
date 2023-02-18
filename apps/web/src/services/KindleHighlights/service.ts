@@ -109,6 +109,7 @@ export class KindleHighlightsService {
         location: highlight.location,
         page: highlight.page.toString(),
         highlightedOn: dayjs(highlight.dateOfCreation).toDate(),
+        isFavourite: false,
       });
     }
 
