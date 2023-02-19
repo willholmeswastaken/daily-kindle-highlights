@@ -47,7 +47,7 @@ const Sync: NextPage<Props> = ({ lastImportedOn }) => {
                 <link rel="icon" href="/favicon.ico" />
             </Head>
             <main>
-                <h1 className="text-4xl font-bold mb-5 text-red">Import Highlights</h1>
+                <h1 className="text-4xl font-bold mb-5 text-red-500">Import Highlights</h1>
                 <div className="flex flex-col sm:flex-row gap-4">
                     <div className="border rounded-lg h-56 w-full sm:w-64 flex flex-col px-4">
                         <Image src="/kindle-icon.png" alt="Kindle" width={50} height={50} className="rounded-lg mt-5" />

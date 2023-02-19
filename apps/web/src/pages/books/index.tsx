@@ -43,7 +43,7 @@ const Books: NextPage<Props> = ({ books }) => {
                 <link rel="icon" href="/favicon.ico" />
             </Head>
             <main className="flex flex-col gap-4">
-                <h1 className="text-4xl font-bold text-red">Books</h1>
+                <h1 className="text-4xl font-bold text-red-500">Books</h1>
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
                     {
                         books.length > 0
