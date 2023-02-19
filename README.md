@@ -10,3 +10,5 @@ This is an app where you can import your library of kindle highlights, get email
 - TailwindCSS
 - Typescript
 - Sendgrid
+
+![Architecture Diagram](docs/ArchDiag.png)
