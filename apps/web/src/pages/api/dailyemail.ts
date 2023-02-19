@@ -1,8 +1,8 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { serverEnv } from "../../env/schema.mjs";
 import { prisma } from "../../server/db";
-import { EmailService } from "../../services/EmailService.js";
-import { HighlightsSelectorService } from "../../services/HighlightsSelectorService.js";
+import { EmailService } from "../../services/EmailService";
+import { HighlightsSelectorService } from "../../services/HighlightsSelectorService";
 
 export default async function handler(
   req: NextApiRequest,
