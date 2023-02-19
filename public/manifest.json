@@ -1,0 +1,13 @@
+{
+  "name": "Rekindled",
+  "short_name": "Rekindled",
+  "start_url": "/",
+  "display": "standalone",
+  "icons": [
+    {
+      "src": "/rekindled-logo.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

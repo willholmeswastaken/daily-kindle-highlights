@@ -6,8 +6,8 @@ jobs:
   cron:
     runs-on: ubuntu-latest
     steps:
-      - name: Call our email api
+      - name: Send daily emails via api call
         run: |
           curl --request POST \
-          --url 'https://yoursite.com/api/cron' \
+          --url '${{ secrets.API_URL }}' \
           --header 'Authorization: Bearer ${{ secrets.API_SECRET_KEY }}'

@@ -69,7 +69,7 @@ const Header = () => {
                     </div>
                 </div>
             </div>
-            <div className={`absolute inset-x-0 top-0 origin-top-right transform p-2 transition md:hidden ${isMobileMenuOpen ? 'block' : 'hidden'}`}>
+            <div className={`absolute inset-x-0 top-0 origin-top-right transform p-2 transition md:hidden z-10 ${isMobileMenuOpen ? 'block' : 'hidden'}`}>
                 <div className="divide-y-2 divide-gray-50 rounded-lg bg-white shadow-lg ring-1 ring-black ring-opacity-5">
                     <div className="px-5 pt-5 pb-6">
                         <div className="flex items-center justify-between">
@@ -92,7 +92,7 @@ const Header = () => {
                             <nav className="grid gap-y-8">
                                 {
                                     isLoggedIn && menuItems.map(x => (
-                                        <Link key={x.name} href={x.url} className="-m-3 flex items-center rounded-md p-3 hover:bg-gray-50">
+                                        <Link key={x.name} href={x.url} className="-m-3 flex items-center rounded-md p-3 hover:bg-gray-50" onClick={closeMobileMenu}>
                                             {x.icon}
                                             <span className="ml-3 text-base font-medium text-gray-900">{x.name}</span>
                                         </Link>
