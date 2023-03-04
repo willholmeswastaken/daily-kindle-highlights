@@ -17,7 +17,13 @@ export default async function handler(
         return;
       }
       const emailService = new EmailService(serverEnv.SENDGRID_API_KEY!);
-      const users = await prisma.user.findMany();
+      const users = await prisma.user.findMany({
+        where: {
+          Book: {
+            some: {},
+          },
+        },
+      });
       await Promise.all(
         users.map(
           async (user) => await sendEmailForUserAsync(emailService, user)
